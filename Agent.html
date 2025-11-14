@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ar">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Agent AI — إدارة مهام Dropshipping</title>
+<style>
+  :root{--bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;--success:#16a34a;--danger:#ef4444}
+  body{font-family:Inter, system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#071029 0%,#081426 100%);color:#e6eef8;margin:0;padding:20px}
+  .container{max-width:1150px;margin:0 auto}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  h1{font-size:20px;margin:0}
+  .grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.05);padding:14px;border-radius:10px}
+  label{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+  input,select,textarea{width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  button{cursor:pointer;padding:8px 12px;border-radius:8px;border:0;background:var(--accent);color:#052027;font-weight:600}
+  .muted{color:var(--muted);font-size:13px}
+  .task{padding:10px;border-radius:8px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center}
+  .pill{padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.06);font-size:12px}
+  .log{font-family:monospace;font-size:12px;background:#00121a;padding:10px;border-radius:8px;max-height:260px;overflow:auto;color:#bfe9f0}
+  .small{font-size:13px;padding:6px 8px}
+  footer{margin-top:16px;color:var(--muted);font-size:13px}
+  .contact{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:#cfe6ff}
+  .contact div{background:rgba(255,255,255,0.04);padding:8px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Agent AI — إدارة المهام والموافقات</h1>
+    <div class="muted">واجهة تشغيل فورية • مهام HTTP • موافقات • سجل تنفيذ</div>
+  </header>
+
+  <div class="grid">
+    <aside class="card">
+      <h3>إنشاء مهمة جديدة</h3>
+      <label>عنوان المهمة</label>
+      <input id="taskTitle" placeholder="مثال: إنشاء Google Sheet للقالب" />
+      <label>نوع التنفيذ</label>
+      <select id="taskType">
+        <option value="http">استدعاء HTTP (API)</option>
+        <option value="local">تنفيذ محلي (محاكاة)</option>
+      </select>
+      <label>تتطلب موافقة؟</label>
+      <select id="requiresApproval">
+        <option value="no">لا</option>
+        <option value="yes">نعم</option>
+      </select>
+      <label>وصف المهمة</label>
+      <textarea id="taskDesc" rows="4" placeholder="مثال: أنشئ ملف Google Sheet وأدرج أوراق العمل..."></textarea>
+
+      <div id="httpFields">
+        <label>HTTP Method و URL</label>
+        <input id="httpMethod" placeholder="GET أو POST" value="POST" />
+        <input id="httpUrl" placeholder="https://YOUR-SERVER/create_sheet" />
+        <label>Payload (JSON) مثال: {"title":"Dropshipping Data"}</label>
+        <textarea id="httpPayload" rows="4" placeholder='{"title":"Dropshipping Data"}'></textarea>
+      </div>
+
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button id="createTaskBtn">إنشاء المهمة</button>
+        <button id="clearBtn" class="small">مسح</button>
+      </div>
+
+      <hr style="margin:12px 0;border-color:rgba(255,255,255,0.08)" />
+
+      <h4>إعدادات الاتصال</h4>
+      <label>API Base (رابط الخادم)</label>
+      <input id="apiBase" placeholder="https://dropshipping-agent.onrender.com" />
+      <label>مفتاح API عام (اختياري Authorization Bearer)</label>
+      <input id="globalApiKey" placeholder="ضع مفتاح API إن لزم" />
+      <label>Webhook للإشعارات</label>
+      <input id="notifyWebhook" placeholder="https://YOUR-SERVER/notify" />
+      <div class="muted" style="margin-top:6px">تُحفظ الإعدادات في جلسة المتصفح فقط.</div>
+
+      <hr style="margin:12px 0;border-color:rgba(255,255,255,0.08)" />
+      <h4>مهام جاهزة (اختيارات سريعة)</h4>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="small" onclick="window.agent.quick('إنشاء Google Sheet','http','POST','/create_sheet',{'title':'Dropshipping Data'},true)">إنشاء Google Sheet (يتطلب موافقة)</button>
+        <button class="small" onclick="window.agent.quick('اختصار رابط Bitly','http','POST','/bitly_shorten',{'url':'https://example.com/product'},false)">اختصار رابط Bitly</button>
+        <button class="small" onclick="window.agent.quick('جلب بيانات منتج','http','GET','/fetch_product?url=https://example.com',null,false)">جلب بيانات منتج</button>
+      </div>
+
+      <hr style="margin:12px 0;border-color:rgba(255,255,255,0.08)" />
+      <h4>بيانات الاتصال الرسمية</h4>
+      <div class="contact">
+        <div>البريد: mortadamort2015@gmail.com</div>
+        <div>واتس الأعمال: ‎00966555302417</div>
+        <div>تلغرام: Akrm Ans</div>
+        <div>تيكتوك: <a href="https://tiktok.com/@aboans473" target="_blank">tiktok.com/@aboans473</a></div>
+        <div>فيسبوك: <a href="https://www.facebook.com/1686443450/posts/pfbid02bux6amA65jmVC7fJTr6VsMRVSvKxgbKVJn5yjSnTwk2zbMKCMBd1ycSQiWYyzBFVl/?app=fbl" target="_blank">رابط</a></div>
+        <div>العنوان: المملكة العربية السعودية – الرياض</div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3>قائمة المهام</h3>
+          <div style="display:flex;gap:8px">
+            <select id="filterStatus">
+              <option value="all">الكل</option>
+              <option value="pending">قيد الانتظار</option>
+              <option value="needs_approval">تنتظر موافقة</option>
+              <option value="done">تم</option>
+              <option value="rejected">مرفوضة</option>
+            </select>
+            <button id="runNext" class="small">تشغيل التالي</button>
+            <button id="clearLogs" class="small">مسح السجل</button>
+          </div>
+        </div>
+        <div id="tasksList" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <h3>سجل التنفيذ</h3>
+        <div id="logArea" class="log">لا سجلات بعد.</div>
+      </div>
+
+      <footer>
+        واجهة محلية — اربطها بخادمك عبر "API Base" لتنفيذ مهام حقيقية بأمان.
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+(() => {
+  const stateKey = 'simple_agent_settings_v2';
+  const tasksKey = 'simple_agent_tasks_v2';
+
+  function saveSettings(){
+    const s = {
+      apiBase: document.getElementById('apiBase').value.trim(),
+      apiKey: document.getElementById('globalApiKey').value.trim(),
+      webhook: document.getElementById('notifyWebhook').value.trim(),
+    };
+    sessionStorage.setItem(stateKey, JSON.stringify(s));
+  }
+  function loadSettings(){
+    const s = JSON.parse(sessionStorage.getItem(stateKey) || '{}');
+    document.getElementById('apiBase').value = s.apiBase || '';
+    document.getElementById('globalApiKey').value = s.apiKey || '';
+    document.getElementById('notifyWebhook').value = s.webhook || '';
+  }
+  function saveTasks(tasks){ localStorage.setItem(tasksKey, JSON.stringify(tasks)); }
+  function loadTasks(){ return JSON.parse(localStorage.getItem(tasksKey) || '[]'); }
+
+  const tasksListEl = document.getElementById('tasksList');
+  const logEl = document.getElementById('logArea');
+
+  function appendLog(msg){
+    const ts = new Date().toLocaleString();
+    if(logEl.innerText === 'لا سجلات بعد.') logEl.innerText = '';
+    logEl.innerText = `[${ts}] ${msg}\n` + logEl.innerText;
+  }
+  function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+
+  function renderTasks(filter='all'){
+    const tasks = loadTasks();
+    tasksListEl.innerHTML = '';
+    const filtered = tasks.filter(t => filter==='all' ? true : t.status===filter);
+    if(filtered.length===0){ tasksListEl.innerHTML = '<div class="muted">لا توجد مهام</div>'; return; }
+    filtered.forEach(t=>{
+      const div = document.createElement('div');
+      div.className = 'task';
+      div.innerHTML = `<div>
+          <div style="font-weight:600">${escapeHtml(t.title)}</div>
+          <div class="muted" style="margin-top:6px">${escapeHtml(t.description||'')}</div>
+          <div style="margin-top:8px"><span class="pill">${t.type}</span> <span class="pill">${t.status}</span> <span class="muted" style="margin-left:8px">#${t.id}</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+          <div style="display:flex;gap:6px">
+            <button class="small" onclick="window.agent.viewTask(${t.id})">عرض</button>
+            ${t.status==='pending' ? `<button class="small" onclick="window.agent.runTask(${t.id})">تشغيل</button>` : ''}
+            ${t.status==='needs_approval' ? `<button class="small" onclick="window.agent.requestApproval(${t.id})">طلب موافقة</button>` : ''}
+            ${t.status==='done' ? `<button class="small" onclick="window.agent.reopenTask(${t.id})">أعد فتح</button>` : ''}
+          </div>
+          <div class="muted">${t.resultSummary||''}</div>
+        </div>`;
+      tasksListEl.appendChild(div);
+    });
+  }
+
+  async function doHttpCall(method, url, payload, apiKey){
+    const opts = { method: method.toUpperCase(), headers: { 'Accept': 'application/json' } };
+    if(apiKey) opts.headers['Authorization'] = 'Bearer ' + apiKey;
+    if(method.toUpperCase()!=='GET' && payload){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(payload); }
+    const resp = await fetch(url, opts);
+    const text = await resp.text();
+    let body=null; try{ body=JSON.parse(text); }catch(e){ body={ text }; }
+    return { status: resp.status, ok: resp.ok, body };
+  }
+
+  window.agent = {
+    createTask(){
+      const title = document.getElementById('taskTitle').value.trim();
+      if(!title) return alert('ضع عنوان المهمة');
+      const tasks = loadTasks();
+      const id = (tasks.length?tasks[tasks.length-1].id+1:1);
+      const type = document.getElementById('taskType').value;
+      const requires = document.getElementById('requiresApproval').value==='yes';
+      const description = document.getElementById('taskDesc').value.trim();
+      const method = document.getElementById('httpMethod').value.trim();
+      const url = document.getElementById('httpUrl').value.trim();
+      const payloadRaw = document.getElementById('httpPayload').value.trim();
+      let payload=null; try{ payload = payloadRaw?JSON.parse(payloadRaw):null; }catch(e){ return alert('Payload يجب أن يكون JSON'); }
+      const s = JSON.parse(sessionStorage.getItem(stateKey) || '{}');
+      const fullUrl = (s.apiBase ? s.apiBase.replace(/\/$/,'') : '') + (url ? url : '');
+      const task = { id, title, type, requiresApproval: requires, status: requires?'needs_approval':'pending', description, http:{ method, url: fullUrl, payload }, createdAt: new Date().toISOString() };
+      tasks.push(task); saveTasks(tasks); saveSettings();
+      appendLog(`تم إنشاء المهمة #${id}: ${title}`); renderTasks(document.getElementById('filterStatus').value);
+    },
+    quick(title,type,method,path,payload,requires){
+      document.getElementById('taskTitle').value = title;
+      document.getElementById('taskType').value = type;
+      document.getElementById('requiresApproval').value = requires?'yes':'no';
+      document.getElementById('httpMethod').value = method;
+      document.getElementById('httpUrl').value = path;
+      document.getElementById('httpPayload').value = payload?JSON.stringify(payload):'';
+      this.createTask();
+    },
+    viewTask(id){
+      const t = loadTasks().find(x=>x.id===id);
+      if(!t) return alert('مهمة غير موجودة');
+      alert(`مهمة #${t.id}\nالعنوان: ${t.title}\nالحالة: ${t.status}\nيتطلب موافقة: ${t.requiresApproval}\n\nHTTP: ${JSON.stringify(t.http,null,2)}\n\nوصف:\n${t.description||''}`);
+    },
+    async runTask(id){
+      const tasks = loadTasks(); const idx = tasks.findIndex(x=>x.id===id); if(idx===-1) return alert('مهمة غير موجودة');
+      const t = tasks[idx]; appendLog(`تشغيل المهمة #${t.id} (${t.title})`);
+      if(t.requiresApproval && t.status==='needs_approval'){ appendLog(`المهمة #${t.id} تنتظر موافقة`); return alert('اطلب الموافقة أولاً.'); }
+      try{
+        if(t.type==='local'){
+          await new Promise(r=>setTimeout(r,800));
+          t.status='done'; t.resultSummary='محاكاة ناجحة'; appendLog(`تمت محاكاة المهمة #${t.id}`);
+        } else if(t.type==='http'){
+          const s = JSON.parse(sessionStorage.getItem(stateKey) || '{}');
+          const res = await doHttpCall(t.http.method||'GET', t.http.url, t.http.payload, s.apiKey);
+          t.status = 'done'; t.resultSummary = `HTTP ${res.status} ${res.ok?'OK':'ERR'}`;
+          appendLog(`نتيجة #${t.id}: ${res.status} - ${JSON.stringify(res.body)}`);
+        }
+      } catch(err){
+        t.status='pending'; t.resultSummary='خطأ: '+(err.message||err); appendLog(`خطأ: ${err.message||err}`);
+      }
+      tasks[idx]=t; saveTasks(tasks); renderTasks(document.getElementById('filterStatus').value);
+    },
+    async requestApproval(id){
+      const tasks = loadTasks(); const idx = tasks.findIndex(x=>x.id===id); if(idx===-1) return alert('مهمة غير موجودة');
+      const t = tasks[idx]; const s = JSON.parse(sessionStorage.getItem(stateKey) || '{}');
+      appendLog(`إرسال طلب موافقة للمهمة #${t.id}`);
+      if(s.webhook){
+        try{
+          const payload = { taskId:t.id, title:t.title, description:t.description, action:'approval_request', timestamp:new Date().toISOString() };
+          const resp = await fetch(s.webhook, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+          appendLog(`Webhook موافقة أُرسل (${resp.status})`);
+        } catch(e){ appendLog(`Webhook فشل: ${e.message}`); }
+      }
+      const approve = confirm(`هل توافق على تنفيذ المهمة الآن؟\n${t.title}`);
+      t.lastApprovalRequest=new Date().toISOString(); t.approvalDecision=approve?'approved':'rejected'; t.approvalAt=new Date().toISOString();
+      if(approve){ t.status='pending'; appendLog(`موافقة محلية للمهمة #${t.id}`); await this.runTask(id); } else { t.status='rejected'; appendLog(`المهمة #${t.id} رُفضت`); }
+      tasks[idx]=t; saveTasks(tasks); renderTasks(document.getElementById('filterStatus').value);
+    },
+    reopenTask(id){ const tasks = loadTasks(); const idx = tasks.findIndex(x=>x.id===id); if(idx===-1) return; tasks[idx].status='pending'; saveTasks(tasks); appendLog(`أعيد فتح المهمة #${id}`); renderTasks(document.getElementById('filterStatus').value); }
+  };
+
+  document.getElementById('filterStatus').addEventListener('change', e=>renderTasks(e.target.value));
+  document.getElementById('runNext').addEventListener('click', ()=>window.agent.runNext && window.agent.runNext());
+  document.getElementById('clearLogs').addEventListener('click', ()=>{ logEl.innerText='لا سجلات بعد.' });
+  document.getElementById('createTaskBtn').addEventListener('click', ()=>{ window.agent.createTask(); });
+  document.getElementById('clearBtn').addEventListener('click', ()=>{ document.getElementById('taskTitle').value=''; document.getElementById('taskDesc').value=''; document.getElementById('httpUrl').value=''; document.getElementById('httpPayload').value=''; });
+  ['apiBase','globalApiKey','notifyWebhook'].forEach(id => document.getElementById(id).addEventListener('input', saveSettings));
+  loadSettings(); renderTasks();
+})();
+</script>
+</body>
+</html>

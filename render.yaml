@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: dropshipping-agent
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    envVars:
+      - key: BITLY_TOKEN
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT
+        value: service_account.json
